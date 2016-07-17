@@ -1,0 +1,9 @@
+/vendor
+/node_modules
+/.phpintel/
+.env
+.DS_Store
+Thumbs.db
+
+README.html
+/Http
