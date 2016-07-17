@@ -1,0 +1,25 @@
+{
+    "name": "igonics/laravel-specific-migrate",
+    "description": "Specific File Migrations for Laravel 5",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "ggordon",
+            "email": "ggordon@igonics.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "~3.0",
+        "mockery/mockery": "~0.9.4",
+        "phpunit/phpunit": "~4.1",
+        "gggordon/artisan":"~5.2"
+    },
+    "autoload": {
+        "psr-0": {
+            "IGonics\\Migrations\\": "src/"
+        }
+    },
+}
