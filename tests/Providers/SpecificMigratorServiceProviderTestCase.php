@@ -5,6 +5,7 @@ use IGonics\Migrations\Console\Commands\DBRollbackSpecific;
 use IGonics\Migrations\Factories\MigratorFactory;
 use IGonics\Migrations\Providers\SpecificMigratorServiceProvider;
 
+
 class SpecificMigratorServiceProviderTestCase extends Orchestra\Testbench\TestCase
 {
 
@@ -17,9 +18,13 @@ class SpecificMigratorServiceProviderTestCase extends Orchestra\Testbench\TestCa
         // ]);
     }
 
+    public function testok(){
+        $this->assertTrue(true);
+    }
 
-
-
+    // public function testSpecificFileMigratorExists(){
+    //     $this->assertTrue(is_a($this->app->make('SpecificFilesMigrator'), MigratorFactory::SpecificMigratorClassName()));
+    // }
 
     /**
      * Define environment setup.
