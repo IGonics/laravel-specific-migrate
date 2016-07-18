@@ -14,7 +14,7 @@ class DBRollbackSpecific extends MigrateCommand
      *
      * @var string
      */
-    protected $name = 'migrate:specific-down';
+    protected $name = 'migrate:specific-rollback';
 
     /**
      * The console command description.

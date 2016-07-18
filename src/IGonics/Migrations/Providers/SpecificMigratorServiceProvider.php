@@ -6,8 +6,6 @@ use Illuminate\Support\ServiceProvider;
 use IGonics\Migrations\Console\Commands\DBMigrateSpecific;
 use IGonics\Migrations\Console\Commands\DBRollbackSpecific;
 use IGonics\Migrations\Factories\MigratorFactory;
-use App;
-
 
 class SpecificMigratorServiceProvider extends ServiceProvider
 {
@@ -16,7 +14,7 @@ class SpecificMigratorServiceProvider extends ServiceProvider
      *
      * @var bool
      */
-    protected $defer = true;
+    protected $defer = false;
 
     /**
      * Bootstrap the application events.
@@ -49,7 +47,11 @@ class SpecificMigratorServiceProvider extends ServiceProvider
         // The migrator is responsible for actually running and rollback the migration
         // files in the application. We'll pass in our database connection resolver
         // so the migrator can resolve any of these connections when it needs to.
-        $this->app->singleton($specificFilesMigratorClass, function ($app, $specificFilesMigratorClass) {
+        $this->app->singleton($specificFilesMigratorClass, function ($app) use($specificFilesMigratorClass) {
+            return new $specificFilesMigratorClass($app['migration.repository'], $app['db'], $app['files']);
+        });
+
+        $this->app->singleton('SpecificFilesMigrator',function ($app) use($specificFilesMigratorClass) {
             return new $specificFilesMigratorClass($app['migration.repository'], $app['db'], $app['files']);
         });
     }
@@ -76,6 +78,7 @@ class SpecificMigratorServiceProvider extends ServiceProvider
             DBMigrateSpecific::class,
             DBRollbackSpecific::class,
             $this->getSpecificMigratorClass(),
+            'SpecificFilesMigrator'
         ];
     }
 }

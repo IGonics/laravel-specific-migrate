@@ -2,8 +2,8 @@
 
 namespace IGonics\Migrations\Factories;
 
-use IGonics\Migrations\Laravel\5\1\SpecificFilesMigrator as L51SpecificFilesMigrator;
-use IGonics\Migrations\Laravel\5\2\SpecificFilesMigrator as L52SpecificFilesMigrator;
+use IGonics\Migrations\Laravel_5_1\SpecificFilesMigrator as L51SpecificFilesMigrator;
+use IGonics\Migrations\Laravel_5_2\SpecificFilesMigrator as L52SpecificFilesMigrator;
 
 class MigratorFactory {
 
@@ -23,11 +23,12 @@ class MigratorFactory {
 
 	}
 
-	public static function GetIlluminateSupportDatabaseVersion(){
-        $migratorClass = 'Illuminate\Database\Migrations\Migrator';
-        $differingMethod = 'run';
+	public static function GetIlluminateSupportDatabaseVersion(
+		$migratorClass = 'Illuminate\Database\Migrations\Migrator',
+		$differingMethod = 'run'
+	){
         $params = static::GetMethodParamsWithKeyNames($migratorClass,$differingMethod);
-
+        
         if(static::isIlluminateSupportDatabaseVersion52($params))
         	return '5.2';
         	
@@ -37,7 +38,7 @@ class MigratorFactory {
         return null;
 	}
 
-	protected static function isIlluminateSupportDatabaseVersion51($params){
+	public static function isIlluminateSupportDatabaseVersion51($params){
         if( array_key_exists('path', $params) ){
         	if( array_key_exists('pretend', $params) ){
                  return $params['pretend']->isOptional();
@@ -46,7 +47,7 @@ class MigratorFactory {
         return false;
 	}
 
-	protected static function isIlluminateSupportDatabaseVersion52($params){
+	public static function isIlluminateSupportDatabaseVersion52($params){
 		if( array_key_exists('path', $params) ){
         	return array_key_exists('options', $params) 
         	   &&  $params['options']->hasType() 
@@ -55,8 +56,8 @@ class MigratorFactory {
         return false;
 	}
 
-	private static function GetMethodParamsWithKeyNames($class, $method){
-		$r = new ReflectionMethod($className, $methodName);
+	protected static function GetMethodParamsWithKeyNames($className, $methodName){
+		$r = new \ReflectionMethod($className, $methodName);
         $params = $r->getParameters();
         $res = [];
         foreach ($params as $param) {
