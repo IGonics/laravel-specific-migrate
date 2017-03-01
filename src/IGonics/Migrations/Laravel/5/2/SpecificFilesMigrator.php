@@ -3,8 +3,9 @@
 namespace IGonics\Notification\Services;
 
 use Illuminate\Database\Migrations\Migrator;
+use IGonics\Migrations\Contracts\ISpecificFilesMigrator;
 
-class SpecificFilesMigrator extends Migrator
+class SpecificFilesMigrator extends Migrator implements ISpecificFilesMigrator
 {
     protected $filesToMigrate = [];
     protected $ensureFilesInPath = true;
