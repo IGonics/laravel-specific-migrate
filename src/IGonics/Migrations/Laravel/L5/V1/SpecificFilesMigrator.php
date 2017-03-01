@@ -1,6 +1,6 @@
 <?php
 
-namespace IGonics\Notification\Services;
+namespace IGonics\Migrations\Laravel\L5\V1;
 
 use Illuminate\Database\Migrations\Migrator;
 use IGonics\Migrations\Contracts\ISpecificFilesMigrator;
@@ -36,21 +36,12 @@ class SpecificFilesMigrator extends Migrator implements ISpecificFilesMigrator
         $this->rollbackPath = $path;
     }
 
-    public function getFilesToMigrate($files = [])
+    public function getFilesToMigrate()
     {
-        $this->filesToMigrate = $files;
+        return $this->filesToMigrate;
     }
-    /**
-     * Get all of the migration files in a given path and verify whether specifie fles exist.
-     *
-     * @param  string  $path
-     * @return array
-     */
-    public function getMigrationFiles($path)
-    {
-        if (!$this->shouldFilesBeInPath()) {
-            return $this->filesToMigrate;
-        }
+
+    protected function getFilesFromPath($path){
         $files = $this->files->glob($path.'/*_*.php');
         // Once we have the array of files in the directory we will just remove the
         // extension and take the basename of the file which is all we need when
@@ -78,9 +69,26 @@ class SpecificFilesMigrator extends Migrator implements ISpecificFilesMigrator
 
             return $inArray;
         });
-
-        return $actualFiles;
     }
+
+
+    /**
+     * Get all of the migration files in a given path and verify whether specifie fles exist.
+     *
+     * @param  string  $path
+     * @return array
+     */
+    public function getMigrationFiles($path)
+    {
+        if (!$this->shouldFilesBeInPath()) {
+            return $this->filesToMigrate;
+        }
+        
+
+        return $this->getFilesFromPath($path);
+    }
+
+
 
     /**
      * Run the outstanding migrations at a given path.
@@ -90,12 +98,13 @@ class SpecificFilesMigrator extends Migrator implements ISpecificFilesMigrator
      * @param  array  $files 
      * @return void
      */
-    public function run($path, array $options = [], $files = [])
+    public function run($path, $pretend = false)
     {
+        $files =$this->getFilesToMigrate();
         if (is_array($files) && !empty($files)) {
             $this->setFilesToMigrate($files);
         }
-        parent::run($path, $options);
+        parent::run($path, $pretend);
     }
 
     /**

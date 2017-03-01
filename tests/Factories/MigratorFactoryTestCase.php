@@ -1,8 +1,9 @@
 <?php
 
 
-use IGonics\Migrations\Laravel_5_1\SpecificFilesMigrator as L51SpecificFilesMigrator;
-use IGonics\Migrations\Laravel_5_2\SpecificFilesMigrator as L52SpecificFilesMigrator;
+use IGonics\Migrations\Laravel\L5\V1\SpecificFilesMigrator as L51SpecificFilesMigrator;
+use IGonics\Migrations\Laravel\L5\V2\SpecificFilesMigrator as L52SpecificFilesMigrator;
+use IGonics\Migrations\Laravel\L5\V3\SpecificFilesMigrator as L53SpecificFilesMigrator;
 use IGonics\Migrations\Factories\MigratorFactory;
 
 class MigratorFactoryTestCase extends PHPUnit_Framework_TestCase {
@@ -17,9 +18,15 @@ class MigratorFactoryTestCase extends PHPUnit_Framework_TestCase {
 			MigratorFactory::SpecificMigratorClassName('5.2'), 
 			L52SpecificFilesMigrator::class
 		);
+
+		$this->assertEquals( 
+			MigratorFactory::SpecificMigratorClassName('5.3'), 
+			L53SpecificFilesMigrator::class
+		);
+
 		$this->assertEquals( 
 			MigratorFactory::SpecificMigratorClassName(), 
-			L52SpecificFilesMigrator::class
+			L53SpecificFilesMigrator::class
 		);
 	}
 

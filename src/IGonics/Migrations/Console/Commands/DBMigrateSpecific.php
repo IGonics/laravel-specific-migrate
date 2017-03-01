@@ -1,11 +1,11 @@
 <?php
 
-namespace IGonics\Notification\Console\Commands;
+namespace IGonics\Migrations\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Symfony\Component\Console\Input\InputOption;
-use IGonics\Notification\Services\SpecificFilesMigrator;
+use IGonics\Migrations\Contracts\ISpecificFilesMigrator;
 
 class DBMigrateSpecific extends MigrateCommand
 {
@@ -26,7 +26,7 @@ class DBMigrateSpecific extends MigrateCommand
     /**
      * Create a new command instance.
      */
-    public function __construct(SpecificFilesMigrator $migrator)
+    public function __construct(ISpecificFilesMigrator $migrator)
     {
         parent::__construct($migrator);
     }

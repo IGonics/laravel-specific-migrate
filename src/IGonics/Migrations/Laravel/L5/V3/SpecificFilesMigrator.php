@@ -1,7 +1,8 @@
 <?php
 
-namespace IGonics\Migrations\Laravel\5\1;
+namespace IGonics\Migrations\Laravel\L5\V3;
 
+use Illuminate\Support\Arr;
 use Illuminate\Database\Migrations\Migrator;
 use IGonics\Migrations\Contracts\ISpecificFilesMigrator;
 
@@ -36,9 +37,9 @@ class SpecificFilesMigrator extends Migrator implements ISpecificFilesMigrator
         $this->rollbackPath = $path;
     }
 
-    public function getFilesToMigrate()
+    public function getFilesToMigrate($files = [])
     {
-        return $this->filesToMigrate;
+        $this->filesToMigrate = $files;
     }
     /**
      * Get all of the migration files in a given path and verify whether specifie fles exist.
@@ -46,7 +47,7 @@ class SpecificFilesMigrator extends Migrator implements ISpecificFilesMigrator
      * @param  string  $path
      * @return array
      */
-    public function getMigrationFiles($path)
+    public function getMigrationFilesFromPath($path)
     {
         if (!$this->shouldFilesBeInPath()) {
             return $this->filesToMigrate;
@@ -82,6 +83,14 @@ class SpecificFilesMigrator extends Migrator implements ISpecificFilesMigrator
         return $actualFiles;
     }
 
+    public function getMigrationFiles($paths){
+        $files=[];
+        foreach ($paths as $path) {
+            $files = array_merge($files, $this->getMigrationFilesFromPath($path));
+        }
+        return $files;
+    }
+
     /**
      * Run the outstanding migrations at a given path.
      *
@@ -90,13 +99,9 @@ class SpecificFilesMigrator extends Migrator implements ISpecificFilesMigrator
      * @param  array  $files 
      * @return void
      */
-    public function run($path, $pretend = false)
+    public function run($paths=[], array $options = [])
     {
-        $files =$this->getFilesToMigrate();
-        if (is_array($files) && !empty($files)) {
-            $this->setFilesToMigrate($files);
-        }
-        parent::run($path, $pretend);
+        parent::run($paths, $options);
     }
 
     /**
@@ -106,50 +111,43 @@ class SpecificFilesMigrator extends Migrator implements ISpecificFilesMigrator
      * @param  array  $files 
      * @return int
      */
-    public function rollback($pretend = false)
+    public function rollback($paths=[], array $options = [])
     {
-        $files = $this->getMigrationFiles();
-        $path = $this->getRollbackPath();
         $this->notes = [];
+
+        $rolledBack = [];
+
         // We want to pull in the last batch of migrations that ran on the previous
         // migration operation. We'll then reverse those migrations and run each
         // of them "down" to reverse the last migration "operation" which ran.
-        if ($path == null) {
-            $this->note('<error>Please specify the base paths where these migrations exists.</error>');
-
-            return 0;
-        }
-        $files = array_filter($files, function ($file) use ($path) {
-            $fullName = "$path/$file.php";
-            if (!file_exists($fullName)) {
-                $this->note("<error>$fullName does not exist...Skipping</error>");
-
-                return false;
-            }
-            require_once $fullName;
-
-            return true;
-        });
-        sort($files);
-        $files = array_reverse($files);
-        $migrations = array_map(function ($filename) {
-            $migration = new \stdClass;
-            $migration->migration = $filename;
-
-            return $migration;
-        }, $files);
-        $count = count($migrations);
-        if ($count === 0) {
-            $this->note('<info>Nothing to rollback. Please specify the files you would like to rollback</info>');
+        if (($steps = Arr::get($options, 'step', 0)) > 0) {
+            $migrations = $this->repository->getMigrations($steps);
         } else {
-            // We need to reverse these migrations so that they are "downed" in reverse
-            // to what they run on "up". It lets us backtrack through the migrations
-            // and properly reverse the entire database schema operation that ran.
+            $migrations = $this->repository->getLast();
+        }
+
+        $count = count($migrations);
+
+        $files = $this->getMigrationFiles($paths);
+
+        if ($count === 0) {
+            $this->note('<info>Nothing to rollback.</info>');
+        } else {
+            // Next we will run through all of the migrations and call the "down" method
+            // which will reverse each migration in order. This getLast method on the
+            // repository already returns these migration's names in reverse order.
+            $this->requireFiles($files);
+
             foreach ($migrations as $migration) {
-                $this->runDown((object) $migration, $pretend);
+                $rolledBack[] = $files[$migration->migration];
+
+                $this->runDown(
+                    $files[$migration->migration],
+                    (object) $migration, Arr::get($options, 'pretend', false)
+                );
             }
         }
 
-        return $count;
+        return $rolledBack;
     }
 }

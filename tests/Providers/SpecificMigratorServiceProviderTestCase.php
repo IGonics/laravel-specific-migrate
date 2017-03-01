@@ -3,7 +3,10 @@
 use IGonics\Migrations\Console\Commands\DBMigrateSpecific;
 use IGonics\Migrations\Console\Commands\DBRollbackSpecific;
 use IGonics\Migrations\Factories\MigratorFactory;
+use IGonics\Migrations\Contracts\ISpecificFilesMigrator;
 use IGonics\Migrations\Providers\SpecificMigratorServiceProvider;
+
+
 
 
 class SpecificMigratorServiceProviderTestCase extends Orchestra\Testbench\TestCase
@@ -19,7 +22,8 @@ class SpecificMigratorServiceProviderTestCase extends Orchestra\Testbench\TestCa
     }
 
     public function testok(){
-        $this->assertTrue(true);
+        $this->assertTrue(null != MigratorFactory::getMigrator());
+
     }
 
     // public function testSpecificFileMigratorExists(){

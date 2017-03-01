@@ -56,6 +56,8 @@ class SpecificMigratorServiceProvider extends ServiceProvider
         $this->app->singleton('SpecificFilesMigrator',$instantiation);
 
         $this->app->singleton(ISpecificFilesMigrator::class,$instantiation);
+
+        var_dump(["ran"]);
     }
 
     /**
